@@ -19,7 +19,7 @@ iris=datasets.load_iris()
 x=iris.data[:,:2]
 y=iris.target
 
-data=x=pd.DataFrame(x)
+data=pd.DataFrame(x)
 data['Target']=y
 data.loc[data.Target==0,'Target']=-1
 data.loc[data.Target==2,'Target']=1
@@ -59,7 +59,7 @@ def wrongclass(label,predict_label):
     y=label[pick]
     x=sample[pick]
     return x,y
-##僵硬。。。。高维数组的布尔索引
+##index in high dimensional array
 
 def gradient(x,y,theta,stepsize):
     update_theta=theta+stepsize*(x.transpose().dot(y))
