@@ -22,8 +22,8 @@ def calcshannonentropy(dataset):
         prob=float(classcount[key])/datasetsize
         shannonentropy-=prob*math.log(prob,2)
     return shannonentropy
-#计算信息熵
-#testdata=np.array([[1,1,'C'],[1,0,'A'],[1,0,'B'],[0,1,'B'],[0,0,'B']])
+#calculate information entropy
+
 
 def splitdataset(dataset,feature_axis,split_value):
     reduceddataset=[]
@@ -33,7 +33,7 @@ def splitdataset(dataset,feature_axis,split_value):
             reducedfv.extend(featurevector[feature_axis+1:])
             reduceddataset.append(reducedfv)
     return reduceddataset
-#按特定属性划分数据
+#split the data by a given feature
 
 def choosefeature(dataset):
     num_feature=len(dataset[0])-1
@@ -53,7 +53,7 @@ def choosefeature(dataset):
             best_info_gain=info_gain
             best_feature=i
     return best_feature
-#选择划分数据的最优属性    
+#select the best feature to split data   
 
 def majorityclass(classlist):
     classcount={}
@@ -79,7 +79,7 @@ def createtree(dataset,feature_label):
         sub_feature_label=feature_label[:]
         tree[bestfeature][value]=createtree(splitdataset(dataset,bestfeature_index,value),sub_feature_label)
     return tree
-#递归生成决策树   
+#generate the tree recursively   
     
     
     
