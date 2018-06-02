@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Sep  1 17:05:36 2017
+
+@author: chendongcai
+"""
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+import time
+import functools
+import numpy as np
+import random as rd
+from sklearn import datasets
+
+iris=datasets.load_iris()
+x=iris.data[:,:2]
+y=iris.target
+
+data=x=pd.DataFrame(x)
+data['Target']=y
+data.loc[data.Target==0,'Target']=-1
+data.loc[data.Target==2,'Target']=1
+
+start=time.clock()
+
+d1=pd.read_csv('/Files/MachineLearning_Exercise/ex2/ex2/ex2data1.txt',sep=',',header=None,names=['Exam1','Exam2','Status'])
+d1.loc[d1.Status==0,'Status']=-1
+input=np.array(data)
+#input=np.array([[2,3,-1],[1,1,-1],[1,0,-1],[4,6,1],[5,10,1],[2,7.5,1],[3,4,1],[5,4,1],[1,2,-1],[4,2.5,1],[3,2.5,-1]])
+#%%
+f1=plt.figure(figsize=(8,8))
+plt.scatter(input[input[:,-1]==-1,0],input[input[:,-1]==-1,1],marker='x')
+plt.scatter(input[input[:,-1]==1,0],input[input[:,-1]==1,1],marker='o')
+plt.xlabel('x') 
+plt.ylabel('y')
+
+x=input[:,:2]
+x=np.column_stack((x,np.ones((x.shape[0],1))))
+label=np.array([input[:,-1]]).transpose()
+sample=x.copy()
+
+def predicty(x,theta):
+    predict_label=x.dot(theta)
+    for i in range(len(predict_label)):
+        if predict_label[i]>0:
+            predict_label[i]=1
+        else:
+            predict_label[i]=-1
+    return predict_label
+
+def wrongclass(label,predict_label):
+    pick=[]
+    for i in range(len(label)):
+        if label[i]!=predict_label[i]:
+            pick.append(i)
+    y=label[pick]
+    x=sample[pick]
+    return x,y
+##僵硬。。。。高维数组的布尔索引
+
+def gradient(x,y,theta,stepsize):
+    update_theta=theta+stepsize*(x.transpose().dot(y))
+    return update_theta
+
+stepsize=1
+maxiteration=1000
+n=sample.shape[1]
+theta=[rd.random() for i in range(n)]
+theta=np.array(theta).reshape((n,1))
+xx=[i for i in np.arange(4,8,0.1)]  
+for i in range(maxiteration):
+    x,y=wrongclass(label,predicty(sample,theta))
+    theta=gradient(x,y,theta,stepsize)
+    
+yy=-theta[2]/theta[1]-theta[0]/theta[1]*xx
+plt.plot(xx,yy)
+end=time.clock()
+print('Running time is %f s'%(end-start))

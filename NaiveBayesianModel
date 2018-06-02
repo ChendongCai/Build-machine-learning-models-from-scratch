@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 28 21:26:42 2017
+
+@author: chendongcai
+"""
+#二分类贝叶斯
+#spam is denoted as 1 which is also our objective
+import numpy as np
+import math
+
+f=open('/Files/data/NaiveBayesianModel/comment.txt','r')
+
+lines=f.readlines()
+
+raw=[line for line in lines]
+comment=[]
+for i in raw:
+    i=i.split(' ')
+    comment.append(i)
+for i in range(len(comment)):
+    comment[i][-1]=comment[i][-1].strip()
+vocabulary=['cute','love','help','garbage','quit','I','problems','is','park','stop','flea','dalmation','licks','food','not','him','buying','posting','has','worthless','ate','to','maybe','please','dog','how','stupid','so','take','mr','steak','my']
+classvector=[0,1,0,1,0,1]
+def createwordlist(dataset):
+    wordlist=set([])
+    for word in dataset:
+        wordlist=set(word)|wordlist
+    return list(wordlist)
+#把所有在文档里出现过的词放进list
+
+def wordtovector(vocabulary,inputset):
+    wordvector=[0]*len(vocabulary)
+    for word in inputset:
+        if word in vocabulary:
+            wordvector[vocabulary.index(word)]=1
+    return wordvector    
+#set of words model 词集模型
+#bag of words model 词袋模型
+
+vector=np.array([0]*len(vocabulary))
+for i in range(len(comment)):
+    vector=np.array(wordtovector(vocabulary,comment[i]))+vector
+v=[1 if i>=1 else 0 for i in vector]
+
+def trainNB(vectormatrix,category):
+    num_documents=len(vectormatrix)
+    num_words=len(vectormatrix[0])
+    p_objective=sum(category)/float(num_documents)
+    p1numerator=np.ones(num_words)
+    p0numerator=np.ones(num_words)
+    p1denominator=2.0
+    p0denominator=2.0
+#    p1numerator=np.zeros(num_words)
+#    p0numerator=np.zeros(num_words)
+#    p1denominator=0.0
+#    p0denominator=0.0
+#改进初始化设置
+#分子加k 分母加2k
+#为了防止出现P（Wi|c）=0 导致P（W1|c）P（W2|c）P（W3|c）....P（Wn|c）=0的情况
+    for i in range(num_documents):
+        if category[i]==1:
+            p1numerator+=vectormatrix[i]
+            p1denominator+=sum(vectormatrix[i])
+            #计算P(Wi|c=1) return list [P(W1|c=1) P(W2|c=1) P(W3|c=1) .....]
+        else:
+            p0numerator+=vectormatrix[i]
+            p0denominator+=sum(vectormatrix[i])
+    p1vector=np.log(p1numerator/p1denominator)
+    p0vector=np.log(p0numerator/p0denominator)
+    return p_objective,p1vector,p0vector
+#返回spam的比例 以及各个词条（token）在spam或者no-spam中出现的比例
+#加log防止floating point number太小造成underflow
+
+vectormatrix=[]
+for i in range(len(comment)):
+    vectormatrix.append(wordtovector(vocabulary,comment[i]))
+category=classvector
+
+def NBclassifier(inputwords,p1vector,p0vector,p_objective):
+    wordsvector=wordtovector(vocabulary,inputwords)
+    p1=sum(wordsvector*p1vector)+np.log(p_objective)
+    p0=sum(wordsvector*p0vector)+np.log(1-p_objective)
+    #log(ab)=log(a)+log(b)
+    if p1>p0:
+        return print('class: %d' % 1)
+    else:
+        return print('class: %d' % 0)

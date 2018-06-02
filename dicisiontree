@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Aug 27 22:04:06 2017
+
+@author: chendongcai
+"""
+##dataset is complete dataset with label in the last column after all the features
+
+import math
+import numpy as np
+import operator
+
+def calcshannonentropy(dataset):
+    datasetsize=len(dataset)
+    classcount={}
+    for featurevector in dataset:
+        label=featurevector[-1]
+        classcount[label]=classcount.get(label,0)+1
+    shannonentropy=0.0
+    for key in classcount:
+        prob=float(classcount[key])/datasetsize
+        shannonentropy-=prob*math.log(prob,2)
+    return shannonentropy
+#计算信息熵
+#testdata=np.array([[1,1,'C'],[1,0,'A'],[1,0,'B'],[0,1,'B'],[0,0,'B']])
+
+def splitdataset(dataset,feature_axis,split_value):
+    reduceddataset=[]
+    for featurevector in dataset:
+        if featurevector[feature_axis]==split_value:
+            reducedfv=featurevector[:feature_axis]
+            reducedfv.extend(featurevector[feature_axis+1:])
+            reduceddataset.append(reducedfv)
+    return reduceddataset
+#按特定属性划分数据
+
+def choosefeature(dataset):
+    num_feature=len(dataset[0])-1
+    base_entropy=calcshannonentropy(dataset)
+    best_info_gain=0
+    best_feature=0
+    for i in range(num_feature):
+        feature_value=[example[i] for example in dataset]
+        unique_value=set(feature_value)
+        new_entropy=0
+        for value in unique_value:
+            subdataset=splitdataset(dataset,i,value)
+            prob=len(subdataset)/float(len(dataset))
+            new_entropy+=prob*calcshannonentropy(subdataset)
+        info_gain=base_entropy-new_entropy
+        if info_gain>best_info_gain:
+            best_info_gain=info_gain
+            best_feature=i
+    return best_feature
+#选择划分数据的最优属性    
+
+def majorityclass(classlist):
+    classcount={}
+    for i in classlist:
+        classcount[i]=classcount.get(i,0)+1
+    sortclasscount=sorted(classcount.items(),key=operator.itemgetter(-1),reverse=True)
+    return sortclasscount[0][0]
+#vote for the majority
+
+def createtree(dataset,feature_label):
+    classlist=[data[-1] for data in dataset]
+    if classlist.count(classlist[0])==len(classlist):
+        return classlist[0]
+    if len(dataset[0])==1:
+        return majorityclass(classlist)
+    bestfeature_index=choosefeature(dataset)
+    bestfeature=feature_label[bestfeature_index]
+    del(feature_label[bestfeature_index])
+    tree={bestfeature:{}}
+    feature_value=[data[bestfeature_index] for data in dataset]
+    unique_feature_value=set(feature_value)
+    for value in unique_feature_value:
+        sub_feature_label=feature_label[:]
+        tree[bestfeature][value]=createtree(splitdataset(dataset,bestfeature_index,value),sub_feature_label)
+    return tree
+#递归生成决策树   
+    
+    
+    
+    

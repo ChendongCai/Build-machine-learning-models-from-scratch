@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Aug 29 18:56:25 2017
+
+@author: chendongcai
+"""
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+import time
+import functools
+import numpy as np
+start=time.clock()
+d1=pd.read_csv('/Files/MachineLearning_Exercise/ex2/ex2/ex2data1.txt',sep=',',header=None,names=['Exam1','Exam2','Status'])
+f1=plt.figure(figsize=(8,8))
+s1=d1[d1.Status==1]
+s0=d1[d1.Status==0]
+plt.scatter(s1.iloc[:,0],s1.iloc[:,1],marker='o',label='Admitted')
+plt.scatter(s0.iloc[:,0],s0.iloc[:,1],marker='x',label='Rejected')
+plt.legend(loc='upper right')
+plt.title('Admission Status')
+plt.xlabel('Exam1 score')
+plt.ylabel('Exam2 score')
+n=3# 初始化
+alpha=0.1#步长
+lam=10
+#l=100
+y=np.array(d1['Status'])
+x=d1[['Exam1','Exam2']]
+x['constant']=1
+xbkp=x.copy
+x=np.array(x)
+def sigmoid(x):
+    return np.array([1.0/(1+math.exp(-i)) for i in x])
+
+def gradientdescent(x,y):
+    stepsize=0.001
+    maxiterations=50000
+    theta=np.ones((n,1))
+    for k in range(maxiterations):
+        A=np.dot(x,theta)
+        E=sigmoid(A)-y
+        theta=theta-stepsize*(np.dot(x.transpose(),np.array([E]).transpose()))
+    return theta
+#gradient descent       
+t=gradientdescent(x,y)
+#return parameter
+
+
+
+xx=[i for i in range(28,100)]
+#ct=0
+#n=200 #iteration times
+#m=len(d1)
+#i_t=[i for i in range(1,n+1)]
+#i_error=[]
+#for i in range(n):
+#    ct+=1
+    #i_t.append(ct)
+    #theta[0]=theta[0]
+    #theta[1]=alpha*theta[1]*(1-l/m)
+    #theta[2]=alpha*theta[2]*(1-l/m)
+#    for i in range(m):
+#        diff=(1/m)*((1/(1+math.e**(-theta[0]-theta[1]*d1.iloc[i,0]-theta[2]*d1.iloc[i,1])))-d1.iloc[i,-1])
+#        theta[0]-=alpha*diff
+#        theta[1]-=alpha*diff*d1.iloc[i,0]
+#        theta[2]-=alpha*diff*d1.iloc[i,1]
+#    error=0
+#    for i in range(m):
+#        error+=-(1/m)*(d1.iloc[i,-1]*math.log(1/(1+math.e**(-theta[0]-theta[1]*d1.iloc[i,0]-theta[2]*d1.iloc[i,1])))+(1-d1.iloc[i,-1])*math.log(1-1/(1+math.e**(-theta[0]-theta[1]*d1.iloc[i,0]-theta[2]*d1.iloc[i,1]))))
+   # for i in range(1,len(theta)):
+       # error+=2*(l/m)*(theta[i]**2)
+#    i_error.append(error)
+#li_error=list(i_error)
+#f2=plt.figure()
+#plt.plot(i_t,i_error)
+#plt.figure(1)
+#x=d1.iloc[:,0]
+g=-t[-1]/t[1]-t[0]/t[1]*xx
+plt.plot(xx,g,'r')
+end=time.clock()
+print('Running Time is %fs'%(end-start))
