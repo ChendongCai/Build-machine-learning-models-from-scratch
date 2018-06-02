@@ -21,8 +21,11 @@ def knnclassifier(inX,dataset,label,k):
         classcount[votelabel]=classcount.get(votelabel,0)+1
     sortclasscount=sorted(classcount.items(),key=operator.itemgetter(1),reverse=True)
     return sortclasscount[0][0]
+
+#create sample data to test the model
 group=np.array([[1.0,1.0],[1.0,1.1],[0,0],[0,0.1]])
 label=['A','A','B','B']
+#define the value of k
 k=3
 inputx=np.array([[0,0],[0.5,0.5],[1.5,1.1]])
 result=DataFrame(inputx)
