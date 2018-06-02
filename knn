@@ -15,7 +15,7 @@ def knnclassifier(inX,dataset,label,k):
     distance=(diffmatrix**2).sum(axis=1)**0.5
     sortdistanceindices=distance.argsort()
     classcount={} 
-    #选择距离最小的k个点
+    #select the k closet points
     for i in range(k):
         votelabel=label[sortdistanceindices[i]]
         classcount[votelabel]=classcount.get(votelabel,0)+1
